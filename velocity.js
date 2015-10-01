@@ -382,7 +382,29 @@
 
     /* For $.data() */
     var cache = {};
-    $.expando = "velocity" + (new Date().getTime());
+    /* For $.data() */
+    var cache = {};
+    $.myClock = function () {
+        if (typeof performance.now === 'function') {
+            return performance.now();
+        } else {
+            if (this.lastValue === undefined) {
+                this.lastValue = (new Date()).getTime();
+                this.correctionFactor = 0;
+            }
+
+            var currentValue = (new Date()).getTime() + this.correctionFactor;
+            if (this.lastValue > currentValue) {
+                this.correctionFactor = (this.lastValue - currentValue) + this.correctionFactor;
+            }
+
+            this.lastValue = currentValue;
+
+            return this.lastValue;
+        }
+    };
+
+    $.expando = "velocity" + $.myClock();//(new Date().getTime());
     $.uuid = 0;
 
     /* For $.queue() */
@@ -465,7 +487,7 @@ return function (global, window, document, undefined) {
         var timeLast = 0;
 
         return window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(callback) {
-            var timeCurrent = (new Date()).getTime(),
+                var timeCurrent = $.myClock();//performance.now();//(new Date()).getTime(),
                 timeDelta;
 
             /* Dynamically set delay on a per-tick basis to match 60fps. */
@@ -3365,7 +3387,7 @@ return function (global, window, document, undefined) {
         if (timestamp) {
             /* We ignore RAF's high resolution timestamp since it can be significantly offset when the browser is
                under high stress; we opt for choppiness over allowing the browser to drop huge chunks of frames. */
-            var timeCurrent = (new Date).getTime();
+            var timeCurrent = $.myClock();//performance.now();//(new Date).getTime();
 
             /********************
                Call Iteration
