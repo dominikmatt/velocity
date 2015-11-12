@@ -385,7 +385,7 @@
     /* For $.data() */
     var cache = {};
     $.myClock = function () {
-        if (typeof performance.now === 'function') {
+        if ((typeof performance !== 'undefined') && (typeof performance.now === 'function')) {
             return performance.now();
         } else {
             if (this.lastValue === undefined) {
